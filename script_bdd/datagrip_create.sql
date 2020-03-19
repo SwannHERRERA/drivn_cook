@@ -1,38 +1,3 @@
-create type location as
-(
-    longitude double precision,
-    latitude  double precision
-);
-
-alter type location owner to postgres;
-
-create type schedule as
-(
-    text_schedule text
-);
-
-alter type schedule owner to postgres;
-
-create type customer_status as enum ('banned', 'active', 'unvalidated');
-
-alter type customer_status owner to postgres;
-
-create type type_address as enum ('facturation', 'livraison');
-
-alter type type_address owner to postgres;
-
-create type type_promo as enum ('all', 'code', 'product');
-
-alter type type_promo owner to postgres;
-
-create type ticket_status as enum ('open', 'close', 'in progress');
-
-alter type ticket_status owner to postgres;
-
-create type type_event as enum ('tasting', 'paulée', 'wine&music', 'masterclass');
-
-alter type type_event owner to postgres;
-
 create table franchisee
 (
     id         serial not null
@@ -410,13 +375,13 @@ alter table order_provider_line
 
 create table order_franchisee
 (
-    id                   serial not null
+    id                  serial not null
         constraint order_franchisee_pkey
             primary key,
-    admin_franchisees_id integer
-        constraint order_franchisee_admin_franchisees_id_fkey
+    admin_franchisee_id integer
+        constraint order_franchisee_admin_franchisee_id_fkey
             references admin_franchisee,
-    created_at           timestamp
+    created_at          timestamp
 );
 
 alter table order_franchisee
@@ -546,6 +511,34 @@ create table customer_order_line
 );
 
 alter table customer_order_line
+    owner to postgres;
+
+create table history
+(
+    id                  serial not null
+        constraint history_pkey
+            primary key,
+    admin_id            integer
+        constraint history_admin_id_fkey
+            references admin,
+    admin_franchisee_id integer
+        constraint history_admin_franchisee_id_fkey
+            references admin_franchisee,
+    created_at          timestamp,
+    action              character varying[],
+    before              jsonb,
+    after               jsonb
+);
+
+alter table history
+    owner to postgres;
+
+create table migrations
+(
+    version integer not null
+);
+
+alter table migrations
     owner to postgres;
 
 

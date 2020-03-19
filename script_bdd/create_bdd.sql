@@ -88,15 +88,11 @@ CREATE TABLE promotion (
     name VARCHAR[120],
     type type_promo,
     amount REAL,
+    order_level INTEGER NULL,
     start_at TIMESTAMP,
     end_at TIMESTAMP,
-    created_at TIMESTAMP
-);
-
-CREATE TABLE promotion_x_truck (
-    promotion_id INTEGER REFERENCES promotion(id),
-    truck_id INTEGER REFERENCES truck(id),
-    PRIMARY KEY (promotion_id, truck_id)
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE customer (
@@ -247,7 +243,7 @@ CREATE TABLE customer_order (
     id SERIAL UNIQUE NOT NULL PRIMARY KEY,
     customer_id INTEGER REFERENCES customer(id),
     created_at TIMESTAMP,
-    trucks_id INTEGER REFERENCES truck(id)
+    truck_id INTEGER REFERENCES truck(id)
 );
 
 CREATE TABLE card_categories (
@@ -280,15 +276,31 @@ CREATE TABLE card_item (
     updated_at TIMESTAMP
 );
 
-CREATE TABLE promotion_x_card_item (
-    promotion_id  INTEGER REFERENCES promotion(id),
-    card_item_id INTEGER REFERENCES card_item(id),
-    PRIMARY KEY (promotion_id, card_item_id)
-);
-
 CREATE TABLE customer_order_line (
     customer_order_id INTEGER REFERENCES customer_order(id),
     card_item_id INTEGER REFERENCES card_item(id),
     quantity REAL,
     PRIMARY KEY (customer_order_id, card_item_id)
+);
+
+CREATE TABLE promotion_target (
+    id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+    promotion_id INTEGER REFERENCES promotion(id),
+    truck_id INTEGER REFERENCES truck(id),
+    card_item_id INTEGER REFERENCES card_item(id)
+);
+
+CREATE TABLE history (
+    id SERIAL UNIQUE NOT NULL PRIMARY KEY,
+    admin_id INTEGER REFERENCES admin(id) NULL,
+    admin_franchisee_id INTEGER REFERENCES admin_franchisee(id) NULL,
+    created_at TIMESTAMP,
+    action VARCHAR[255],
+    before jsonb,
+    after jsonb
+);
+
+create table migrations
+(
+    version INTEGER not null
 );
