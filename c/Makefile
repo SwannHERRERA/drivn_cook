@@ -29,7 +29,7 @@
 # - CFLAGS: Any extra user-specified compiler flags (can be blank).
 
 # Recommended compiler flags:
-CFLAGS += -std=c99 -O
+CFLAGS += -std=c18 -O
 
 # Extra flags for diagnostics:
 # CFLAGS += -g -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -fsanitize=undefined,address
@@ -53,6 +53,7 @@ CFLAGS += -std=c99 -O
 LIB = qrcodegen
 LIBFILE = lib$(LIB).a
 LIBOBJ = qrcodegen.o
+LIBC = libbmp.c
 MAINS = qr
 
 # Build all binaries
@@ -62,10 +63,11 @@ all: $(LIBFILE) $(MAINS)
 clean:
 	rm -f -- $(LIBOBJ) $(LIBFILE) $(MAINS:=.o) $(MAINS)
 	rm -rf .deps
+	rm test.bmp
 
 # Executable files
 %: %.o $(LIBFILE)
-	$(CC) $(CFLAGS) -o $@ $< -L . -l $(LIB)
+	$(CC) $(CFLAGS) -o $@ $(LIBC) $< -L . -l $(LIB)
 
 # The library
 $(LIBFILE): $(LIBOBJ)
