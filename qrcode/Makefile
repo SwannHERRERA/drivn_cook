@@ -54,7 +54,7 @@ LIB = qrcodegen
 LIBFILE = lib$(LIB).a
 LIBOBJ = qrcodegen.o
 LIBC = libbmp.c
-MAINS = qr
+MAINS = generate
 
 # Build all binaries
 all: $(LIBFILE) $(MAINS)
@@ -63,7 +63,6 @@ all: $(LIBFILE) $(MAINS)
 clean:
 	rm -f -- $(LIBOBJ) $(LIBFILE) $(MAINS:=.o) $(MAINS)
 	rm -rf .deps
-	rm test.bmp
 
 # Executable files
 %: %.o $(LIBFILE)
