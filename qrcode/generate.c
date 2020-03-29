@@ -33,13 +33,14 @@ int main(int argc, char **argv) {
 	// Encode argv[1] with qrcodegen_encodeText function
 	bool isSuccess = qrcodegen_encodeText(name, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
 	if (isSuccess) {
-		printf("is Success ! \n");
 		qrcode = saveQr(qrcode_identifier, 20, name);
-		printf("is Save ! \n");
+		curl_easy_setopt(curl, CURLOPT_USERPWD, "wilk65537:H4E4tIWc");
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-		printf("Upload on ! \n");
-		curl_easy_setopt(curl, CURLOPT_URL, "ftp://192.168.1.16/");
-		printf("FTP URL on ! \n");
+		char* remote_url = (char*)malloc(strlen("ftp://192.168.1.16/uploads/") + strlen(name) + strlen(".bmp"));
+		strcpy(remote_url, "ftp://192.168.1.16/uploads/");
+		strcat(remote_url, name);
+		strcat(remote_url, ".bmp");
+		curl_easy_setopt(curl, CURLOPT_URL, remote_url);
 		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
 
 		res = curl_easy_perform(curl);
@@ -48,6 +49,10 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "curl_easy_perform() failed: %s\n",
 				curl_easy_strerror(res));
 		}
+		free(remote_url);
+		curl_easy_cleanup(curl);
+		fclose(qrcode);
+		curl_global_cleanup();
 		return EXIT_SUCCESS;
 	} else {
 		return EXIT_FAILURE;
