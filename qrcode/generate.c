@@ -4,8 +4,9 @@
 #include <string.h>
 #include "qrcodegen.h"
 #include "libbmp.h"
+#include <curl/curl.h>
 
-static void saveQr(const uint8_t qrcode[], int size_img_coef, const char* text);
+static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text);
 
 int main(int argc, char **argv) {
 	
@@ -14,22 +15,48 @@ int main(int argc, char **argv) {
 		return EXIT_FAILURE;
 	}
 
-	const char *text = argv[1];
+	CURL *curl;
+	FILE* qrcode;
+	CURLcode res;
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	if(curl) {
+		printf("Curl OK ! \n");
+	}
+
+	const char *name = argv[1];
 	enum qrcodegen_Ecc errCorLvl = qrcodegen_Ecc_LOW;  // Error correction level
 	
 	// Make and print the QR Code symbol
-	uint8_t qrcode[qrcodegen_BUFFER_LEN_MAX];
+	uint8_t qrcode_identifier[qrcodegen_BUFFER_LEN_MAX];
 	uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
 	// Encode argv[1] with qrcodegen_encodeText function
-	bool isSuccess = qrcodegen_encodeText(text, tempBuffer, qrcode, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
+	bool isSuccess = qrcodegen_encodeText(name, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
 	if (isSuccess) {
-		saveQr(qrcode, 20, text);
+		printf("is Success ! \n");
+		qrcode = saveQr(qrcode_identifier, 20, name);
+		printf("is Save ! \n");
+		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+		printf("Upload on ! \n");
+		curl_easy_setopt(curl, CURLOPT_URL, "ftp://192.168.1.16/");
+		printf("FTP URL on ! \n");
+		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
+
+		res = curl_easy_perform(curl);
+		/* Check for errors */ 
+		if(res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n",
+				curl_easy_strerror(res));
+		}
+		return EXIT_SUCCESS;
+	} else {
+		return EXIT_FAILURE;
 	}
-	return EXIT_SUCCESS;
 }
 
-static void saveQr(const uint8_t qrcode[], int size_img_coef, const char* text) {
+static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text) {
 	bmp_img img;
+	FILE* qrcodeFile;
 	int size = qrcodegen_getSize(qrcode);
 	bmp_img_init_df (&img, size * size_img_coef, size * size_img_coef);
 	for (int y = 0; y < size; y++) {
@@ -51,11 +78,15 @@ static void saveQr(const uint8_t qrcode[], int size_img_coef, const char* text) 
 
 	// output/ = 7
 	//  .bmp = 4
-	char *filename = malloc(sizeof(char) * (11 + strlen(text)));
+	char* filename = malloc(sizeof(char) * (11 + strlen(text)));
 	strcpy(filename, "output/");
 	strcat(filename, text);
 	strcat(filename, ".bmp");
 
-	bmp_img_write (&img, filename);
-	bmp_img_free (&img);
+	bmp_img_write(&img, filename);
+	bmp_img_free(&img);
+
+	qrcodeFile = fopen(filename, "r");
+	free(filename);
+	return qrcodeFile;
 }
