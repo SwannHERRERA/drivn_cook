@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="main_window">
+    <property name="width_request">500</property>
+    <property name="height_request">650</property>
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Driv'n'Cook</property>
+    <property name="icon">../Logo Driv'n'Cook.png</property>
+    <signal name="destroy" handler="on_main_windows_destroy" swapped="no"/>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkStack" id="stack1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkFixed" id="pg_top_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="halign">center</property>
+            <child>
+              <object class="GtkStackSwitcher" id="swt">
+                <property name="width_request">350</property>
+                <property name="height_request">83</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="stack">stack1</property>
+              </object>
+              <packing>
+                <property name="y">503</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkImage">
+                <property name="width_request">313</property>
+                <property name="height_request">310</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="pixbuf">../Logo Driv'n'Cook.png</property>
+              </object>
+              <packing>
+                <property name="x">20</property>
+                <property name="y">9</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="name">Accueil</property>
+            <property name="title" translatable="yes">Accueil</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
