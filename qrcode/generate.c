@@ -11,12 +11,25 @@ static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text)
 
 GtkBuilder* 	builder; 
 
-GtkWidget*		window;
+GtkWidget*		main_window;
 
-// called when window is closed
-void on_main_windows_destroy()
-{
-    gtk_main_quit();
+GtkWidget* 		main_container;
+
+GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *statut_input, *birthdate_input, *enterprise_name_input;
+
+
+void load_widget() {
+	main_window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
+    gtk_window_set_title(GTK_WINDOW(main_window), "DrivnCook creation franchisée");
+    g_signal_connect(main_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+    main_container       	= GTK_WIDGET(gtk_builder_get_object(builder, "main_container"));
+    submit_button      		= GTK_WIDGET(gtk_builder_get_object(builder, "submit_button"));
+    lastname_input         	= GTK_WIDGET(gtk_builder_get_object(builder, "lastname_input"));
+    firstname_input  		= GTK_WIDGET(gtk_builder_get_object(builder, "firstname_input"));
+    statut_input    		= GTK_WIDGET(gtk_builder_get_object(builder, "statut_input"));
+    birthdate_input       	= GTK_WIDGET(gtk_builder_get_object(builder, "birthdate_input"));
+    enterprise_name_input   = GTK_WIDGET(gtk_builder_get_object(builder, "enterprise_name_input"));
 }
 
 int main(int argc, char **argv) {
@@ -28,12 +41,13 @@ int main(int argc, char **argv) {
 
 	gtk_init(&argc, &argv);
 
-	builder = gtk_builder_new_from_file("../assets/glade/main.glade");
+	builder = gtk_builder_new_from_file("./assets/glade/main.glade");
+	
+	load_widget();
 
-    window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
-    gtk_builder_connect_signals(builder, NULL);
+	gtk_builder_connect_signals(builder, NULL);
 
-    gtk_widget_show(window);
+    gtk_widget_show(main_window);
 
     g_object_unref(builder);
     gtk_main();

@@ -1,4 +1,4 @@
-CC=gcc-8
+CC=gcc
 CFLAGS= -Wall -Wextra -Werror
 dev: build start
 # main.c
