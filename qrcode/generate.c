@@ -8,6 +8,7 @@
 #include <gtk/gtk.h>
 
 static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text);
+void on_submit_button_clicked();
 
 GtkBuilder* 	builder; 
 
@@ -15,7 +16,7 @@ GtkWidget*		main_window;
 
 GtkWidget* 		main_container;
 
-GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *statut_input, *birthdate_input, *enterprise_name_input;
+GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *statut_input, *birthdate_input, *enterprise_name_input, *error_input;
 
 
 void load_widget() {
@@ -30,15 +31,10 @@ void load_widget() {
     statut_input    		= GTK_WIDGET(gtk_builder_get_object(builder, "statut_input"));
     birthdate_input       	= GTK_WIDGET(gtk_builder_get_object(builder, "birthdate_input"));
     enterprise_name_input   = GTK_WIDGET(gtk_builder_get_object(builder, "enterprise_name_input"));
+	error_input				= GTK_WIDGET(gtk_builder_get_object(builder, "error_input"));
 }
 
 int main(int argc, char **argv) {
-
-	if(argc <= 1) {
-		printf("Usage : ./qr [text]\n");
-		return EXIT_FAILURE;
-	}
-
 	gtk_init(&argc, &argv);
 
 	builder = gtk_builder_new_from_file("./assets/glade/main.glade");
@@ -52,49 +48,57 @@ int main(int argc, char **argv) {
     g_object_unref(builder);
     gtk_main();
 
-	// CURL *curl;
-	// FILE* qrcode;
-	// CURLcode res;
-	// curl_global_init(CURL_GLOBAL_ALL);
-	// curl = curl_easy_init();
-	// if(curl) {
-	// 	printf("Curl OK ! \n");
-	// }
+		return EXIT_SUCCESS; 
+}
 
-	// const char *name = argv[1];
-	// enum qrcodegen_Ecc errCorLvl = qrcodegen_Ecc_LOW;  // Error correction level
+void on_submit_button_clicked() {
+	char* name = malloc((strlen("Erreur 'Lastname'") + 1) * sizeof(char));
+	strcpy(name, "Erreur 'Lastname'");
+
+	gtk_entry_set_text(GTK_ENTRY(error_input), (const gchar*) name);
 	
-	// // Make and print the QR Code symbol
-	// uint8_t qrcode_identifier[qrcodegen_BUFFER_LEN_MAX];
-	// uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
-	// // Encode argv[1] with qrcodegen_encodeText function
-	// bool isSuccess = qrcodegen_encodeText(name, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
-	// if (isSuccess) {
-	// 	qrcode = saveQr(qrcode_identifier, 20, name);
-	// 	curl_easy_setopt(curl, CURLOPT_USERPWD, "wilk65537:H4E4tIWc");
-	// 	curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-	// 	char* remote_url = (char*)malloc(strlen("ftp://192.168.1.16/uploads/") + strlen(name) + strlen(".bmp"));
-	// 	strcpy(remote_url, "ftp://192.168.1.16/uploads/");
-	// 	strcat(remote_url, name);
-	// 	strcat(remote_url, ".bmp");
-	// 	curl_easy_setopt(curl, CURLOPT_URL, remote_url);
-	// 	curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
+	CURL *curl;
+	FILE* qrcode;
+	CURLcode res;
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	if(curl) {
+		printf("Curl OK ! \n");
+	}
 
-	// 	res = curl_easy_perform(curl);
-	// 	/* Check for errors */ 
-	// 	if(res != CURLE_OK) {
-	// 		fprintf(stderr, "curl_easy_perform() failed: %s\n",
-	// 			curl_easy_strerror(res));
-	// 	}
-	// 	free(remote_url);
-	// 	curl_easy_cleanup(curl);
-	// 	fclose(qrcode);
-	// 	curl_global_cleanup();
-	// 	return EXIT_SUCCESS;
-	// } else {
-	// 	return EXIT_FAILURE;
-	// }
-	return EXIT_SUCCESS; 
+	enum qrcodegen_Ecc errCorLvl = qrcodegen_Ecc_LOW;  // Error correction level
+	
+	// Make and print the QR Code symbol
+	uint8_t qrcode_identifier[qrcodegen_BUFFER_LEN_MAX];
+	uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
+	// Encode argv[1] with qrcodegen_encodeText function
+	bool isSuccess = qrcodegen_encodeText(name, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
+	if (isSuccess) {
+		qrcode = saveQr(qrcode_identifier, 20, name);
+		curl_easy_setopt(curl, CURLOPT_USERPWD, "sftp:GHTinuguErer");
+		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+		curl_easy_setopt(curl, CURLOPT_PORT, 2222L);
+		char* remote_url = (char*)malloc(strlen("sftp://51.255.173.90/uploads/") + strlen(name) + strlen(".bmp"));
+		strcpy(remote_url, "sftp://51.255.173.90/uploads/");
+		strcat(remote_url, name);
+		strcat(remote_url, ".bmp");
+		curl_easy_setopt(curl, CURLOPT_URL, remote_url);
+		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
+
+		res = curl_easy_perform(curl);
+		/* Check for errors */ 
+		if(res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n",
+				curl_easy_strerror(res));
+		}
+		free(remote_url);
+		curl_easy_cleanup(curl);
+		fclose(qrcode);
+		curl_global_cleanup();
+	} else {
+		exit(EXIT_FAILURE);
+	}
+
 }
 
 static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text) {
