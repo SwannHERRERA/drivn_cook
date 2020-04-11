@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.0 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="main_window">
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkFixed" id="main_container">
+        <property name="width_request">1100</property>
+        <property name="height_request">800</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkImage" id="logo">
+            <property name="width_request">313</property>
+            <property name="height_request">310</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../Logo Driv'n'Cook.png</property>
+          </object>
+          <packing>
+            <property name="x">383</property>
+            <property name="y">126</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="submit_button">
+            <property name="label" translatable="yes">Envoyer</property>
+            <property name="width_request">100</property>
+            <property name="height_request">50</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_submit_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">504</property>
+            <property name="y">600</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="lastname_input">
+            <property name="width_request">168</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">465</property>
+            <property name="y">30</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="firstname_input">
+            <property name="width_request">168</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">764</property>
+            <property name="y">173</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="statut_input">
+            <property name="width_request">168</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">717</property>
+            <property name="y">427</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="birthdate_input">
+            <property name="width_request">168</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">156</property>
+            <property name="y">175</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="enterprise_name_input">
+            <property name="width_request">168</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">216</property>
+            <property name="y">441</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="firstname_label">
+            <property name="width_request">100</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Firstname</property>
+            <property name="xalign">0</property>
+          </object>
+          <packing>
+            <property name="x">766</property>
+            <property name="y">137</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="lastname_label">
+            <property name="width_request">100</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Lastname</property>
+            <property name="xalign">0</property>
+          </object>
+          <packing>
+            <property name="x">469</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="birthdate_label">
+            <property name="width_request">147</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Birthdate (jj-mm-yyyy)</property>
+          </object>
+          <packing>
+            <property name="x">155</property>
+            <property name="y">114</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="statut_label">
+            <property name="width_request">100</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Statut</property>
+            <property name="xalign">0</property>
+          </object>
+          <packing>
+            <property name="x">718</property>
+            <property name="y">392</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="entreprise_name_label">
+            <property name="width_request">134</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Nom de l'entreprise</property>
+            <property name="xalign">0</property>
+          </object>
+          <packing>
+            <property name="x">216</property>
+            <property name="y">398</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTextView" id="error_text_view">
+            <property name="width_request">400</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">342</property>
+            <property name="y">682</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
+</interface>
