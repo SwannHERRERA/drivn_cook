@@ -110,12 +110,9 @@ static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text)
 		for (int yi = 0; yi < size_img_coef; yi += 1) {
 			for (int x = 0; x < size; x++) {
 				for (int xi = 0; xi < size_img_coef; xi += 1) {
-					if (qrcodegen_getModule(qrcode, x, y)) 
-					{
+					if (qrcodegen_getModule(qrcode, x, y)) {
 						bmp_pixel_init(&img.img_pixels[y * size_img_coef + yi][x * size_img_coef + xi], 250, 250, 250);
-					} 
-					else 
-					{
+					} else {
 						bmp_pixel_init(&img.img_pixels[y * size_img_coef + yi][x * size_img_coef + xi], 0, 0, 0);
 					}
 				}
