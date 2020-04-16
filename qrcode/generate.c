@@ -4,9 +4,14 @@
 #include <string.h>
 #include "qrcodegen.h"
 #include "libbmp.h"
+#include <png.h>
 #include <curl/curl.h>
 #include <gtk/gtk.h>
+#include <openssl/sha.h>
 
+
+FILE* create_file();
+char* sha1_file(FILE* file);
 static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text);
 void on_submit_button_clicked();
 
@@ -74,7 +79,9 @@ void on_submit_button_clicked() {
 	// Encode argv[1] with qrcodegen_encodeText function
 	bool isSuccess = qrcodegen_encodeText(name, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
 	if (isSuccess) {
-		qrcode = saveQr(qrcode_identifier, 20, name);
+		FILE* file_info = create_file();
+		char* hash = sha1_file(file_info);
+		qrcode = saveQr(qrcode_identifier, 20, hash);
 		curl_easy_setopt(curl, CURLOPT_USERPWD, "sftp:GHTinuguErer");
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 		curl_easy_setopt(curl, CURLOPT_PORT, 2222L);
@@ -85,15 +92,16 @@ void on_submit_button_clicked() {
 		curl_easy_setopt(curl, CURLOPT_URL, remote_url);
 		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
 
-		res = curl_easy_perform(curl);
-		/* Check for errors */ 
-		if(res != CURLE_OK) {
-			fprintf(stderr, "curl_easy_perform() failed: %s\n",
-				curl_easy_strerror(res));
-		}
+		// res = curl_easy_perform(curl);
+		// /* Check for errors */ 
+		// if(res != CURLE_OK) {
+		// 	fprintf(stderr, "curl_easy_perform() failed: %s\n",
+		// 		curl_easy_strerror(res));
+		// }
 		free(remote_url);
 		curl_easy_cleanup(curl);
 		fclose(qrcode);
+		fclose(file_info);
 		curl_global_cleanup();
 	} else {
 		exit(EXIT_FAILURE);
@@ -133,4 +141,57 @@ static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text)
 	qrcodeFile = fopen(filename, "r");
 	free(filename);
 	return qrcodeFile;
+}
+
+/**
+ * Create name_of_franchisee.txt with infomation of the franchisee
+ */
+FILE* create_file() {
+	unsigned int i;
+	char* str; 
+	// Avec file vaiable selon le nom du franchsee
+	FILE* file = fopen("output/cxc.txt", "r+");
+	if (file == NULL) {
+		file = fopen("output/file.txt", "wb");
+		GtkWidget* inputs[5] = {firstname_input, lastname_input, statut_input, birthdate_input, enterprise_name_input};
+		for (i = 0; i < 5; i += 1) {
+			str = (char*)malloc((strlen(gtk_entry_get_text(GTK_ENTRY(inputs[i]))) + 1) * sizeof(char));
+			strcpy(str, (char*)gtk_entry_get_text(GTK_ENTRY(inputs[i])));
+			fprintf(file, "%s\n", str);
+			free(str);
+		}
+		return file; 
+	} else {
+		fclose(file);
+		fprintf(stderr, "Erreur le franchisee existe déjà\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+char* sha1_file(FILE* file) {
+	char * buffer = 0;
+	long length;
+
+	if (file) {
+		fseek(file, 0, SEEK_END);
+		length = ftell(file);
+		fseek(file, 0, SEEK_SET);
+		buffer = malloc(length);
+		if (buffer) {
+			// if (1 != fwrite(buffer, 1, length, file)) {
+			// 	fprintf( stderr, "Cannot write block in file\n" );
+			// }
+			fread(buffer, 1, length, file);
+		}
+	}
+
+	if (buffer) {
+		size_t length = strlen(buffer);
+		unsigned char hash[SHA_DIGEST_LENGTH];
+		free(buffer);
+		return  SHA1(buffer, length, hash);
+	} else {
+		fprintf(stderr, "Cannot read buffer\n");
+		exit(EXIT_FAILURE);
+	}
 }
