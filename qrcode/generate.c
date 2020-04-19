@@ -128,7 +128,6 @@ void on_submit_button_clicked() {
 		free(remote_url);
 		
 		curl_easy_cleanup(curl);
-		// fclose(qrcode);
 		curl_global_cleanup();
 		fclose(file_info);
 		free(hash);
