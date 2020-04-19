@@ -1,2 +1,2 @@
 all:
-gcc *.c -lpng -ljpeg -lm
+	gcc *.c -lpng -ljpeg -lm
