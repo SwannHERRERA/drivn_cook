@@ -10,8 +10,8 @@
 #include <openssl/sha.h>
 
 
-FILE* create_file();
-char* sha1_file(FILE* file);
+void create_file();
+void sha1_file(FILE* file, char* hash);
 static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text);
 void on_submit_button_clicked();
 
@@ -61,9 +61,17 @@ void on_submit_button_clicked() {
 	strcpy(name, "Erreur 'Lastname'");
 
 	gtk_entry_set_text(GTK_ENTRY(error_input), (const gchar*) name);
+	free(name);
 	
 	CURL *curl;
 	FILE* qrcode;
+	FILE* file_info;
+	char* hash = (char*)malloc(sizeof(char) * ((SHA_DIGEST_LENGTH * 2) + 1));
+	if (!hash) {
+		fprintf(stderr, "Error Malloc hash");
+		exit(EXIT_FAILURE);
+	}
+	char* remote_url;
 	CURLcode res;
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
@@ -72,41 +80,46 @@ void on_submit_button_clicked() {
 	}
 
 	enum qrcodegen_Ecc errCorLvl = qrcodegen_Ecc_LOW;  // Error correction level
+
+	create_file();
+	file_info = fopen("./output/file.txt", "rb");
+	sha1_file(file_info, hash);
+	printf("%s\n", hash);
 	
+
 	// Make and print the QR Code symbol
 	uint8_t qrcode_identifier[qrcodegen_BUFFER_LEN_MAX];
 	uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
 	// Encode argv[1] with qrcodegen_encodeText function
-	bool isSuccess = qrcodegen_encodeText(name, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
+	bool isSuccess = qrcodegen_encodeText(hash, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
 	if (isSuccess) {
-		FILE* file_info = create_file();
-		char* hash = sha1_file(file_info);
 		qrcode = saveQr(qrcode_identifier, 20, hash);
 		curl_easy_setopt(curl, CURLOPT_USERPWD, "sftp:GHTinuguErer");
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 		curl_easy_setopt(curl, CURLOPT_PORT, 2222L);
-		char* remote_url = (char*)malloc(strlen("sftp://51.255.173.90/uploads/") + strlen(name) + strlen(".bmp"));
+		char* remote_url = (char*)malloc(strlen("sftp://51.255.173.90/uploads/") + strlen(hash) + strlen(".bmp"));
 		strcpy(remote_url, "sftp://51.255.173.90/uploads/");
-		strcat(remote_url, name);
+		strcat(remote_url, hash);
 		strcat(remote_url, ".bmp");
 		curl_easy_setopt(curl, CURLOPT_URL, remote_url);
 		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
 
-		// res = curl_easy_perform(curl);
-		// /* Check for errors */ 
-		// if(res != CURLE_OK) {
-		// 	fprintf(stderr, "curl_easy_perform() failed: %s\n",
-		// 		curl_easy_strerror(res));
-		// }
+		res = curl_easy_perform(curl);
+		/* Check for errors */ 
+		if(res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n",
+				curl_easy_strerror(res));
+		}
 		free(remote_url);
+		
 		curl_easy_cleanup(curl);
-		fclose(qrcode);
-		fclose(file_info);
+		// fclose(qrcode);
 		curl_global_cleanup();
+		fclose(file_info);
+		free(hash);
 	} else {
 		exit(EXIT_FAILURE);
 	}
-
 }
 
 static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text) {
@@ -146,7 +159,7 @@ static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text)
 /**
  * Create name_of_franchisee.txt with infomation of the franchisee
  */
-FILE* create_file() {
+void create_file() {
 	unsigned int i;
 	char* str; 
 	// Avec file vaiable selon le nom du franchsee
@@ -160,7 +173,7 @@ FILE* create_file() {
 			fprintf(file, "%s\n", str);
 			free(str);
 		}
-		return file; 
+		fclose(file);
 	} else {
 		fclose(file);
 		fprintf(stderr, "Erreur le franchisee existe déjà\n");
@@ -168,30 +181,30 @@ FILE* create_file() {
 	}
 }
 
-char* sha1_file(FILE* file) {
-	char * buffer = 0;
-	long length;
+void sha1_file(FILE* file, char* hash) {
+	char *buffer = 0;
+    size_t length;
 
-	if (file) {
-		fseek(file, 0, SEEK_END);
-		length = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		buffer = malloc(length);
-		if (buffer) {
-			// if (1 != fwrite(buffer, 1, length, file)) {
-			// 	fprintf( stderr, "Cannot write block in file\n" );
-			// }
-			fread(buffer, 1, length, file);
-		}
-	}
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        length = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        buffer = malloc(length);
+        if (buffer) {
+            fread(buffer, sizeof(char), length, file);
+        }
+    }
 
-	if (buffer) {
-		size_t length = strlen(buffer);
-		unsigned char hash[SHA_DIGEST_LENGTH];
+    if (buffer) {
+        unsigned char tmphash[SHA_DIGEST_LENGTH*2];
+
+        SHA1(buffer, length, tmphash);
+        for (size_t i = 0; i < SHA_DIGEST_LENGTH; i++) {
+            sprintf((char *)&(hash[i * 2]), "%02x", tmphash[i]);
+        }
 		free(buffer);
-		return  SHA1(buffer, length, hash);
-	} else {
-		fprintf(stderr, "Cannot read buffer\n");
+    } else {
+		fprintf(stderr, "Erreur malloc buffer");
 		exit(EXIT_FAILURE);
 	}
 }
