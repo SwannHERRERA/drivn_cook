@@ -33,13 +33,23 @@ int main(int argc, char** argv) {
     }
 
     if (buffer) {
-        // Do stuff
+        /**
+         * recupéré chaque ligne
+         */ 
+        // while (strtork(buffer, "\n") != NULL) {
+            
+        // }
     } else {
         fprintf(stderr, "Erreur Malloc\n");
         exit(EXIT_FAILURE);
     }
 
 
+    char* lastname = "HERRERA";
+    char* firstname = "FirstName";
+    char* socityname = "Graines d'octets";
+    char* siret = "OGOegj";
+    char* email = "swann@graines-octets.com";
 
     PGconn *conn = PQconnectdb("user=postgres password=drivncook dbname=postgres hostaddr=51.255.173.90");
 
@@ -50,6 +60,17 @@ int main(int argc, char** argv) {
     }
     
     // res = PQexec(conn, "INSERT INTO user VALUES(NULL, ,)");
+    // const char* stmtName = "PREPARE_INSERT_USER";
+    // PGresult* stmt = PQprepare(
+    //         conn,
+    //         stmtName,
+    //         "INSERT INTO users "
+    //         "VALUES (NULL, NULL, $1, $2, $3, $4, $5, NULL, NOW());",
+    //         6,
+    //         (const Oid *) oidTypes
+    //         );
+
+    // PQexecPrepared
 
     char *user = PQuser(conn);
     char *db_name = PQdb(conn);

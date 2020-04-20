@@ -35,7 +35,7 @@ GtkWidget*		main_window;
 
 GtkWidget* 		main_container;
 
-GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *statut_input, *birthdate_input, *enterprise_name_input, *error_input;
+GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *statut_input, *siret_input, *email_input, *enterprise_name_input, *error_input;
 
 
 void load_widget() {
