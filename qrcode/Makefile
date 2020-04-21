@@ -53,7 +53,6 @@ CFLAGS += -std=c18 -O
 LIB = qrcodegen
 LIBFILE = lib$(LIB).a
 LIBOBJ = qrcodegen.o
-LIBC = libbmp.c
 MAINS = generate
 
 # Build all binaries
@@ -66,7 +65,7 @@ clean:
 
 # Executable files
 %: %.o $(LIBFILE)
-	$(CC) $(CFLAGS) -o $@ $(LIBC) $< -L . -l $(LIB) `pkg-config --libs --cflags gtk+-3.0` -lcurl -export-dynamic
+	$(CC) $(CFLAGS) -o $@ $< -L . -l $(LIB) `pkg-config --libs --cflags gtk+-3.0` -lcurl -lcrypto -lpng -export-dynamic
 
 # The library
 $(LIBFILE): $(LIBOBJ)

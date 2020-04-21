@@ -19,8 +19,7 @@
             <property name="pixbuf">../Logo Driv'n'Cook.png</property>
           </object>
           <packing>
-            <property name="x">383</property>
-            <property name="y">126</property>
+            <property name="x">374</property>
           </packing>
         </child>
         <child>
@@ -34,8 +33,8 @@
             <signal name="clicked" handler="on_submit_button_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">504</property>
-            <property name="y">600</property>
+            <property name="x">486</property>
+            <property name="y">738</property>
           </packing>
         </child>
         <child>
@@ -46,8 +45,8 @@
             <property name="can_focus">True</property>
           </object>
           <packing>
-            <property name="x">465</property>
-            <property name="y">30</property>
+            <property name="x">222</property>
+            <property name="y">318</property>
           </packing>
         </child>
         <child>
@@ -58,12 +57,12 @@
             <property name="can_focus">True</property>
           </object>
           <packing>
-            <property name="x">764</property>
-            <property name="y">173</property>
+            <property name="x">720</property>
+            <property name="y">320</property>
           </packing>
         </child>
         <child>
-          <object class="GtkEntry" id="statut_input">
+          <object class="GtkEntry" id="siret_input">
             <property name="width_request">168</property>
             <property name="height_request">80</property>
             <property name="visible">True</property>
@@ -75,15 +74,15 @@
           </packing>
         </child>
         <child>
-          <object class="GtkEntry" id="birthdate_input">
-            <property name="width_request">168</property>
+          <object class="GtkEntry" id="email_input">
+            <property name="width_request">575</property>
             <property name="height_request">80</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
           </object>
           <packing>
-            <property name="x">156</property>
-            <property name="y">175</property>
+            <property name="x">249</property>
+            <property name="y">610</property>
           </packing>
         </child>
         <child>
@@ -108,8 +107,8 @@
             <property name="xalign">0</property>
           </object>
           <packing>
-            <property name="x">766</property>
-            <property name="y">137</property>
+            <property name="x">725</property>
+            <property name="y">289</property>
           </packing>
         </child>
         <child>
@@ -122,29 +121,30 @@
             <property name="xalign">0</property>
           </object>
           <packing>
-            <property name="x">469</property>
+            <property name="x">226</property>
+            <property name="y">284</property>
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="birthdate_label">
+          <object class="GtkLabel" id="email_label">
             <property name="width_request">147</property>
             <property name="height_request">80</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Birthdate (jj-mm-yyyy)</property>
+            <property name="label" translatable="yes">email</property>
           </object>
           <packing>
-            <property name="x">155</property>
-            <property name="y">114</property>
+            <property name="x">205</property>
+            <property name="y">558</property>
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="statut_label">
+          <object class="GtkLabel" id="siret_label">
             <property name="width_request">100</property>
             <property name="height_request">40</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Statut</property>
+            <property name="label" translatable="yes">Siret</property>
             <property name="xalign">0</property>
           </object>
           <packing>
@@ -174,8 +174,8 @@
             <property name="can_focus">True</property>
           </object>
           <packing>
-            <property name="x">347</property>
-            <property name="y">688</property>
+            <property name="x">330</property>
+            <property name="y">832</property>
           </packing>
         </child>
       </object>
