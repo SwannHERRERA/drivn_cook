@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     PGresult* stmt = PQprepare(
         conn,
         stmtName,
-        "INSERT INTO users (first_name, last_name, society_name, siret, email, created_at)"
+        "INSERT INTO users (first_name, last_name, siret, email, society_name, created_at)"
         "VALUES ($1, $2, $3, $4, $5, NOW());",
         5,
         NULL

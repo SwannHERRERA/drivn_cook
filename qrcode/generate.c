@@ -71,11 +71,12 @@ int main(int argc, char **argv) {
 }
 
 void on_submit_button_clicked() {
-	char* name = malloc((strlen("Erreur 'Lastname'") + 1) * sizeof(char));
-	strcpy(name, "Erreur 'Lastname'");
-
-	gtk_entry_set_text(GTK_ENTRY(error_input), (const gchar*) name);
-	free(name);
+	const char* file_name = malloc(sizeof(char) * strlen(gtk_entry_get_text(GTK_ENTRY(lastname_input))));
+	file_name = gtk_entry_get_text(GTK_ENTRY(lastname_input));
+	if (!strcmp(file_name, "")) {
+	gtk_entry_set_text(GTK_ENTRY(error_input), (const gchar*) "Erreur 'Lastname'");
+		return;
+	}
 	
 	CURL *curl;
 	FILE* qrcode;
@@ -108,16 +109,21 @@ void on_submit_button_clicked() {
 
 	bool isSuccess = qrcodegen_encodeText(hash, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
 	if (isSuccess) {
-		qrcode = saveQr(qrcode_identifier, 20, hash);
-		curl_easy_setopt(curl, CURLOPT_USERPWD, "user-sftp-only:znmVu%oE%K2S4l#74^^1!4mIKvc");
+		qrcode = saveQr(qrcode_identifier, 20, file_name);
+		curl_easy_setopt(curl, CURLOPT_USERPWD, "swann:myges");
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 		curl_easy_setopt(curl, CURLOPT_PORT, 2222L);
-		char* remote_url = (char*)malloc(strlen("sftp://51.255.173.90/uploads/") + strlen(hash) + strlen(".png"));
-		strcpy(remote_url, "sftp://51.255.173.90/uploads/");
-		strcat(remote_url, hash);
+		char* remote_url = (char*)malloc((strlen("sftp://51.255.173.90/home/swann/uploads/") + strlen(file_name) + strlen(".png")) * sizeof(char));
+		strcpy(remote_url, "sftp://51.255.173.90/home/swann/uploads/");
+		strcat(remote_url, file_name);
 		strcat(remote_url, ".png");
+
+		printf("%s\n", remote_url);
+
 		curl_easy_setopt(curl, CURLOPT_URL, remote_url);
 		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
+
+
 
 		res = curl_easy_perform(curl);
 		/* Check for errors */ 
@@ -131,6 +137,7 @@ void on_submit_button_clicked() {
 		curl_global_cleanup();
 		fclose(file_info);
 		free(hash);
+		gtk_main_quit();
 	} else {
 		exit(EXIT_FAILURE);
 	}
@@ -187,20 +194,21 @@ static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text)
 		}
 	}
 
-	if (save_png_to_file(&img, "./output/qrcode.png")) {
+	char* filepath = malloc(sizeof(char) * (strlen("output/.png") + strlen(text)));
+	strcpy(filepath, "output/");
+	strcat(filepath, text);
+	strcat(filepath, ".png");
+
+	if (save_png_to_file(&img, filepath)) {
 		fprintf(stderr, "Error writing file.\n");
 		exit(EXIT_FAILURE);
     }
 
     free (img.pixels);
 
-	char* filename = malloc(sizeof(char) * (strlen("output/.png") + strlen(text)));
-	strcpy(filename, "output/");
-	strcat(filename, text);
-	strcat(filename, ".png");
 
-	qrcodeFile = fopen(filename, "r");
-	free(filename);
+	qrcodeFile = fopen(filepath, "r");
+	free(filepath);
 	return qrcodeFile;
 }
 
