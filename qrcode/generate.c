@@ -109,7 +109,7 @@ void on_submit_button_clicked() {
 	bool isSuccess = qrcodegen_encodeText(hash, tempBuffer, qrcode_identifier, errCorLvl, qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
 	if (isSuccess) {
 		qrcode = saveQr(qrcode_identifier, 20, hash);
-		curl_easy_setopt(curl, CURLOPT_USERPWD, "sftp:znmVu%oE%K2S4l#74^^1!4mIKvc");
+		curl_easy_setopt(curl, CURLOPT_USERPWD, "user-sftp-only:znmVu%oE%K2S4l#74^^1!4mIKvc");
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 		curl_easy_setopt(curl, CURLOPT_PORT, 2222L);
 		char* remote_url = (char*)malloc(strlen("sftp://51.255.173.90/uploads/") + strlen(hash) + strlen(".png"));
