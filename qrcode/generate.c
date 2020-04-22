@@ -71,12 +71,17 @@ int main(int argc, char **argv) {
 }
 
 void on_submit_button_clicked() {
-	const char* file_name = malloc(sizeof(char) * strlen(gtk_entry_get_text(GTK_ENTRY(lastname_input))));
-	file_name = gtk_entry_get_text(GTK_ENTRY(lastname_input));
+	char* file_name = malloc(sizeof(char) * strlen(gtk_entry_get_text(GTK_ENTRY(lastname_input))));
+	file_name = (char*)gtk_entry_get_text(GTK_ENTRY(lastname_input));
 	if (!strcmp(file_name, "")) {
-	gtk_entry_set_text(GTK_ENTRY(error_input), (const gchar*) "Erreur 'Lastname'");
+		gtk_entry_set_text(GTK_ENTRY(error_input), (const gchar*) "Erreur 'Lastname'");
 		return;
 	}
+
+	char* txt_path = (char*)malloc(sizeof(char) * (strlen(gtk_entry_get_text(GTK_ENTRY(lastname_input))) + strlen("output/.txt")));
+	strcpy(txt_path, "output/");
+	strcat(txt_path, (char*)gtk_entry_get_text(GTK_ENTRY(lastname_input)));
+	strcat(txt_path, ".txt");
 	
 	CURL *curl;
 	FILE* qrcode;
@@ -97,8 +102,9 @@ void on_submit_button_clicked() {
 	enum qrcodegen_Ecc errCorLvl = qrcodegen_Ecc_LOW;  // Error correction level
 
 	create_file();
-	file_info = fopen("./output/file.txt", "rb");
+	file_info = fopen(txt_path, "rb");
 	sha1_file(file_info, hash);
+	fclose(file_info);
 	printf("%s\n", hash);
 	
 
@@ -124,19 +130,39 @@ void on_submit_button_clicked() {
 		curl_easy_setopt(curl, CURLOPT_READDATA, qrcode);
 
 
-
 		res = curl_easy_perform(curl);
+
 		/* Check for errors */ 
 		if(res != CURLE_OK) {
 			fprintf(stderr, "curl_easy_perform() failed: %s\n",
 				curl_easy_strerror(res));
 		}
+
+		strcpy(remote_url, "sftp://51.255.173.90/home/swann/uploads/");
+		strcat(remote_url, file_name);
+		strcat(remote_url, ".txt");
+
+		file_info = fopen(txt_path, "r");
+
+		curl_easy_setopt(curl, CURLOPT_URL, remote_url);
+		curl_easy_setopt(curl, CURLOPT_READDATA, file_info);
+
+		res = curl_easy_perform(curl);
+
+		/* Check for errors */ 
+		if(res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n",
+				curl_easy_strerror(res));
+		}
+
 		free(remote_url);
 		
 		curl_easy_cleanup(curl);
 		curl_global_cleanup();
 		fclose(file_info);
 		free(hash);
+		free(file_name);
+		free(txt_path);
 		gtk_main_quit();
 	} else {
 		exit(EXIT_FAILURE);
@@ -217,11 +243,16 @@ static FILE* saveQr(const uint8_t qrcode[], int size_img_coef, const char* text)
  */
 void create_file() {
 	unsigned int i;
-	char* str; 
+	char* str;
+	char* file_path = (char*)malloc(sizeof(char) * (strlen(gtk_entry_get_text(GTK_ENTRY(lastname_input))) + strlen("output/.txt")));
+	strcpy(file_path, "output/");
+	strcat(file_path, (char*)gtk_entry_get_text(GTK_ENTRY(lastname_input)));
+	strcat(file_path, ".txt");
+	
 	// Avec file vaiable selon le nom du franchsee
-	FILE* file = fopen("output/cxc.txt", "r+");
+	FILE* file = fopen(file_path, "r+");
 	if (file == NULL) {
-		file = fopen("output/file.txt", "wb");
+		file = fopen(file_path, "wb");
 		GtkWidget* inputs[5] = {firstname_input, lastname_input, siret_input, email_input, enterprise_name_input};
 		for (i = 0; i < 5; i += 1) {
 			str = (char*)malloc((strlen(gtk_entry_get_text(GTK_ENTRY(inputs[i]))) + 1) * sizeof(char));
@@ -230,6 +261,7 @@ void create_file() {
 			free(str);
 		}
 		fclose(file);
+		free(file_path);
 	} else {
 		fclose(file);
 		fprintf(stderr, "Erreur le franchisee existe déjà\n");
