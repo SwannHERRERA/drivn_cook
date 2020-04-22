@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <postgresql/libpq-fe.h>
+
+ #define NUMBER_OF_CHAMPS 5
 
 void do_exit(PGconn *conn) {
     
@@ -9,9 +12,8 @@ void do_exit(PGconn *conn) {
 }
 
 int main(int argc, char** argv) {
-    
     if (argc < 2) {
-        fprintf(stderr, "Erreur nombre d'argument\n Usage: %s name_data_file", argv[0]);
+        fprintf(stderr, "Erreur nombre d'argument\n Usage: %s name_data_file\n", argv[0]);
         return EXIT_FAILURE;
     }
     FILE* file = fopen(argv[1],"rb+");
@@ -31,27 +33,44 @@ int main(int argc, char** argv) {
     if (buffer) {
         fread(buffer, sizeof(char), length, file);
     }
-
+    char* paramValues[NUMBER_OF_CHAMPS];
     if (buffer) {
-        /**
-         * recupéré chaque ligne
-         */ 
-        // while (strtork(buffer, "\n") != NULL) {
-            
-        // }
+        char* pch;
+        int i = 0;
+        pch = strtok(buffer,"\n");
+        while (pch != NULL) {
+            paramValues[i] = (char*)malloc(strlen(pch) * sizeof(char));
+            strcpy(paramValues[i], pch);
+            pch = strtok(NULL, "\n");
+            i += 1;
+        }
     } else {
-        fprintf(stderr, "Erreur Malloc\n");
+        fprintf(stderr, "Malloc Error\n");
         exit(EXIT_FAILURE);
     }
 
+    PGresult *res = NULL;
+   
+    int paramLengths[NUMBER_OF_CHAMPS];
+    int paramFormats[NUMBER_OF_CHAMPS];
+    for (size_t i = 0; i < NUMBER_OF_CHAMPS; i++) {
+        paramLengths[i] = sizeof(paramValues[i]);
+        paramFormats[i] = 0;
+    }
+    
+    int resultFormat = 0;
 
-    char* lastname = "HERRERA";
-    char* firstname = "FirstName";
-    char* socityname = "Graines d'octets";
-    char* siret = "OGOegj";
-    char* email = "swann@graines-octets.com";
-
-    PGconn *conn = PQconnectdb("user=postgres password=drivncook dbname=postgres hostaddr=51.255.173.90");
+    /****     test param      *****/
+    // for (size_t i = 0; i < NUMBER_OF_CHAMPS; i++) {
+    //     printf("param Length: %d\n"
+    //            "param Format: %d\n"
+    //            "param value: %s\n",
+    //            paramLengths[i],
+    //            paramFormats[i],
+    //            paramValues[i]);
+    // }
+    
+    PGconn *conn = PQconnectdb("user=postgres password=drivncook dbname=drivncook hostaddr=51.255.173.90");
 
     if (PQstatus(conn) == CONNECTION_BAD) { 
         fprintf(stderr, "Connection to database failed: %s\n",
@@ -60,25 +79,35 @@ int main(int argc, char** argv) {
     }
     
     // res = PQexec(conn, "INSERT INTO user VALUES(NULL, ,)");
-    // const char* stmtName = "PREPARE_INSERT_USER";
-    // PGresult* stmt = PQprepare(
-    //         conn,
-    //         stmtName,
-    //         "INSERT INTO users "
-    //         "VALUES (NULL, NULL, $1, $2, $3, $4, $5, NULL, NOW());",
-    //         6,
-    //         (const Oid *) oidTypes
-    //         );
-
-    // PQexecPrepared
-
-    char *user = PQuser(conn);
-    char *db_name = PQdb(conn);
-    char *pswd = PQpass(conn);
-    
-    printf("User: %s\n", user);
-    printf("Database name: %s\n", db_name);
-    printf("Password: %s\n", pswd);
+    const char* stmtName = "PREPARE_INSERT_USER";
+    PGresult* stmt = PQprepare(
+        conn,
+        stmtName,
+        "INSERT INTO users (first_name, last_name, society_name, siret, email, created_at)"
+        "VALUES ($1, $2, $3, $4, $5, NOW());",
+        5,
+        NULL
+    );
+    if (PQresultStatus(stmt) != PGRES_COMMAND_OK) {
+        fprintf(stderr, "PQexecPrepared failed: %s", PQresultErrorMessage(stmt));
+        PQclear(stmt);
+    } else {
+        PQclear(stmt);
+        res = PQexecPrepared(conn, 
+            stmtName,
+            5,
+            (const char* const*)paramValues,
+            paramLengths,
+            paramFormats,
+            resultFormat
+        );
+        if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+            fprintf(stderr, "PQexecPrepared failed: %s", PQresultErrorMessage(res));
+        } else {
+            printf("Enregistrement en BDD OK !\n");
+        }
+    }
+    PQclear(stmt);
     
     PQfinish(conn);
 

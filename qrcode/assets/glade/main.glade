@@ -45,8 +45,8 @@
             <property name="can_focus">True</property>
           </object>
           <packing>
-            <property name="x">222</property>
-            <property name="y">318</property>
+            <property name="x">218</property>
+            <property name="y">319</property>
           </packing>
         </child>
         <child>
@@ -121,8 +121,8 @@
             <property name="xalign">0</property>
           </object>
           <packing>
-            <property name="x">226</property>
-            <property name="y">284</property>
+            <property name="x">218</property>
+            <property name="y">283</property>
           </packing>
         </child>
         <child>
@@ -172,9 +172,10 @@
             <property name="height_request">80</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="margin_bottom">22</property>
           </object>
           <packing>
-            <property name="x">330</property>
+            <property name="x">342</property>
             <property name="y">832</property>
           </packing>
         </child>

@@ -35,7 +35,7 @@ GtkWidget*		main_window;
 
 GtkWidget* 		main_container;
 
-GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *statut_input, *siret_input, *email_input, *enterprise_name_input, *error_input;
+GtkWidget *logo, *submit_button, *lastname_input, *firstname_input, *siret_input, *email_input, *enterprise_name_input, *error_input;
 
 
 void load_widget() {
@@ -47,8 +47,8 @@ void load_widget() {
     submit_button      		= GTK_WIDGET(gtk_builder_get_object(builder, "submit_button"));
     lastname_input         	= GTK_WIDGET(gtk_builder_get_object(builder, "lastname_input"));
     firstname_input  		= GTK_WIDGET(gtk_builder_get_object(builder, "firstname_input"));
-    statut_input    		= GTK_WIDGET(gtk_builder_get_object(builder, "statut_input"));
-    birthdate_input       	= GTK_WIDGET(gtk_builder_get_object(builder, "birthdate_input"));
+    siret_input    		= GTK_WIDGET(gtk_builder_get_object(builder, "siret_input"));
+    email_input       	= GTK_WIDGET(gtk_builder_get_object(builder, "email_input"));
     enterprise_name_input   = GTK_WIDGET(gtk_builder_get_object(builder, "enterprise_name_input"));
 	error_input				= GTK_WIDGET(gtk_builder_get_object(builder, "error_input"));
 }
@@ -214,7 +214,7 @@ void create_file() {
 	FILE* file = fopen("output/cxc.txt", "r+");
 	if (file == NULL) {
 		file = fopen("output/file.txt", "wb");
-		GtkWidget* inputs[5] = {firstname_input, lastname_input, statut_input, birthdate_input, enterprise_name_input};
+		GtkWidget* inputs[5] = {firstname_input, lastname_input, siret_input, email_input, enterprise_name_input};
 		for (i = 0; i < 5; i += 1) {
 			str = (char*)malloc((strlen(gtk_entry_get_text(GTK_ENTRY(inputs[i]))) + 1) * sizeof(char));
 			strcpy(str, (char*)gtk_entry_get_text(GTK_ENTRY(inputs[i])));
