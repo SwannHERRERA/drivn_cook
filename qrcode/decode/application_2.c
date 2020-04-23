@@ -29,7 +29,10 @@ int main(int argc, char **argv) {
         fseek(file, 0, SEEK_SET);
         buffer = malloc(length);
         if (buffer) {
-            fread(buffer, 1, length, file);
+            if (length != fread(buffer, 1, length, file)) {
+                fprintf(stderr, "Cannot read blocks in file\n");
+				exit(EXIT_FAILURE);
+            }
         }
         fclose(file);
     }

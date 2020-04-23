@@ -272,14 +272,16 @@ void create_file() {
 void sha1_file(FILE* file, char* hash) {
 	char *buffer = 0;
     size_t length;
-
     if (file) {
         fseek(file, 0, SEEK_END);
         length = ftell(file);
         fseek(file, 0, SEEK_SET);
         buffer = malloc(length);
         if (buffer) {
-            fread(buffer, sizeof(char), length, file);
+			if (length != fread(buffer, sizeof(char), length, file)) {
+				fprintf(stderr, "Cannot read blocks in file\n");
+				exit(EXIT_FAILURE);
+			}
         }
     }
 

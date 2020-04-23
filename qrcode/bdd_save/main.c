@@ -31,7 +31,10 @@ int main(int argc, char** argv) {
     fseek(file, 0, SEEK_SET);
     buffer = malloc(length);
     if (buffer) {
-        fread(buffer, sizeof(char), length, file);
+        if (length != fread(buffer, sizeof(char), length, file)) {
+            fprintf(stderr, "Cannot read blocks in file\n");
+            exit(EXIT_FAILURE);
+        }
     }
     char* paramValues[NUMBER_OF_CHAMPS];
     if (buffer) {
@@ -78,7 +81,6 @@ int main(int argc, char** argv) {
         do_exit(conn);
     }
     
-    // res = PQexec(conn, "INSERT INTO user VALUES(NULL, ,)");
     const char* stmtName = "PREPARE_INSERT_USER";
     PGresult* stmt = PQprepare(
         conn,
